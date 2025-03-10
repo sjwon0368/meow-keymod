@@ -90,6 +90,17 @@
             border-radius: 5px;
             position: relative;
         }
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+        }
         .dialog {
             position: fixed;
             top: 50%;
@@ -103,6 +114,7 @@
             display: none;
             transition: opacity 0.3s ease-in-out;
             opacity: 0;
+            z-index: 1001;
         }
         .dialog.show {
             opacity: 1;
@@ -195,6 +207,7 @@
     <div class="progress-container">
         <div class="progress-bar" id="progress-bar"></div>
     </div>
+    <div class="dialog-overlay" id="dialog-overlay"></div>
     <div class="dialog" id="dialog">
         <p id="dialog-text">Please choose a default key mode.</p>
         <button class="dialog-button" id="dialog-ok">OK</button>
@@ -212,6 +225,7 @@
                 $(this).text("Next");
             } else if (step === 2) {
                 if ($("#default-mode").val() === "none") {
+                    $("#dialog-overlay").removeClass("hide").addClass("show").fadeIn();
                     $("#dialog").removeClass("hide").addClass("show").fadeIn();
                     step--;
                     return;
@@ -242,6 +256,9 @@
             $("#dialog").fadeOut(function() {
                 $("#dialog").removeClass("show").addClass("hide");
             });
+            $("#dialog-overlay").fadeOut(function() {
+                $("#dialog-overlay").removeClass("show").addClass("hide");
+            });
         });
         let activeKeyButton = null;
 let keys = [];
@@ -262,6 +279,7 @@ document.querySelectorAll(".key-button").forEach(button => {
         keys = [];
         $("#dialog-text").text("Set a key combo for switching to " + $(`.keymode-labels #${this.id}`).text());
         $("#dialog-ok").addClass("hidden");
+        $("#dialog-overlay").removeClass("hide").addClass("show").fadeIn();
         $("#dialog").removeClass("hide").addClass("show").fadeIn();
     });
 });
@@ -285,12 +303,14 @@ document.addEventListener("keyup", function(event) {
             if (keyCombos.has(keyCombo)) {
                 $("#dialog-text").text("You used the same key combo again.");
                 $("#dialog-ok").removeClass("hidden");
+                $("#dialog-overlay").removeClass("hide").addClass("show").fadeIn();
                 $("#dialog").removeClass("hide").addClass("show").fadeIn();
                 activeKeyButton.textContent = "(Not set)";
             } else {
                 keyCombos.add(keyCombo);
                 activeKeyButton.textContent = keyCombo;
                 $("#dialog").removeClass("show").addClass("hide").fadeOut();
+                $("#dialog-overlay").removeClass("show").addClass("hide").fadeOut();
                 $("#dialog-ok").addClass("hidden");
                 localStorage.setItem(`userMode${(activeKeyButton.id).replace("mode", "")}SwitchKeyCombo`, activeKeyButton.textContent);
                 console.log("Saved as: " + activeKeyButton.textContent);
