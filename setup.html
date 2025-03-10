@@ -195,7 +195,6 @@
     <div class="progress-container">
         <div class="progress-bar" id="progress-bar"></div>
     </div>
-    
     <div class="dialog" id="dialog">
         <p id="dialog-text">Please choose a default key mode.</p>
         <button class="dialog-button" id="dialog-ok">OK</button>
@@ -226,7 +225,18 @@
                 $("#progress-bar").css("width", "65%");
                 $("#progress-text").text("Step 3/3");
                 $(this).text("Confirm");
-            }
+            } else if (step === 3) {
+                $("#setup-text").text("Finished! You can now go to the main menu.");
+                $(".container-keymode-switch-combo").addClass("hidden");
+                $(".keymode-buttons").addClass("hidden");
+                $(".keymode-labels").addClass("hidden");
+                $("#progress-bar").css("width", "100%");
+                $("#progress-text").text("All steps finished!");
+                localStorage.setItem("userPref", "setupFinished");
+                $(this).text("Continue");
+            } else if (step === 4) {
+                location.href = "./main.html"
+            } else step = 1;
         });
         $("#dialog-ok").on("click", function() {
             $("#dialog").fadeOut(function() {
@@ -236,10 +246,11 @@
         let activeKeyButton = null;
 let keys = [];
 const keySymbols = {
-    "Control": "⎈",
+    "Control": "⌤",
     "Shift": "⇧",
     "Alt": "⌥",
-    "Meta": "⌘"
+    "Meta": "⌘",
+    "Tab": "⭾"
 };
 
 const keyCombos = new Set();
@@ -249,7 +260,8 @@ document.querySelectorAll(".key-button").forEach(button => {
         activeKeyButton = this;
         this.textContent = "(Waiting for keys)";
         keys = [];
-        $("#dialog-text").text("Press the keys for switching to " + $(`.keymode-labels #${this.id}`).text());
+        $("#dialog-text").text("Set a key combo for switching to " + $(`.keymode-labels #${this.id}`).text());
+        $("#dialog-ok").addClass("hidden");
         $("#dialog").removeClass("hide").addClass("show").fadeIn();
     });
 });
@@ -272,12 +284,15 @@ document.addEventListener("keyup", function(event) {
             const keyCombo = formatKeys(keys);
             if (keyCombos.has(keyCombo)) {
                 $("#dialog-text").text("You used the same key combo again.");
+                $("#dialog-ok").removeClass("hidden");
                 $("#dialog").removeClass("hide").addClass("show").fadeIn();
                 activeKeyButton.textContent = "(Not set)";
             } else {
                 keyCombos.add(keyCombo);
                 activeKeyButton.textContent = keyCombo;
                 $("#dialog").removeClass("show").addClass("hide").fadeOut();
+                $("#dialog-ok").addClass("hidden");
+                localStorage.setItem(`userMode${(activeKeyButton.id).replace("mode", "")}SwitchKeyCombo`, activeKeyButton.textContent);
                 console.log("Saved as: " + activeKeyButton.textContent);
             }
             activeKeyButton = null;
