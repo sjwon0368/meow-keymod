@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Meow Playground KeyMod",
+    "version": "0.1.0",
+    "description": "Adds key movement controls, mouse following controls, throwing aim system and many more useful controls to Meow Playground.",
+    "permissions": ["scripting", "storage", "activeTab"],
+    "host_permissions": ["https://meowplayground.com/*"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+      }
+    },
+    "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }
+  
