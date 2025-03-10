@@ -31,19 +31,211 @@
             top: 20px;
             left: 20px;
         }
+        .title-sub1 {
+            font-size: 1.05rem;
+            position: absolute;
+            top: 80px;
+            left: 60px;
+        }
+        .title-sub2 {
+            font-size: 1.05rem;
+            position: absolute;
+            top: 180px;
+            left: 60px;
+        }
+        .title-sub3 {
+            font-size: 1.05rem;
+            position: absolute;
+            top: 430px;
+            left: 60px;
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            position: absolute;
+            top: 460px;
+            left: 80px;
+        }
+        .hidden {
+            display: none;
+        }
+        select {
+            appearance: none;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            top: 115px;
+            left: 70px;
+            position: absolute;
+            font-size: 0.95rem;
+        }
+        .button {
+            background: linear-gradient(135deg, #4F46E5, #9333EA);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+        .key-button {
+            background: #444;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .container-keymode-switch-combo {
+            width: 400px;
+            height: 170px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            position: absolute;
+            top: 220px;
+            left: 70px;
+            border: 2px #434343 solid;
+            border-radius: 10px;
+        }
+        .keymode-labels {
+            flex: 1;
+            margin-left: 10px;
+        }
+        .key-label {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .keymode-buttons {
+            flex: 1;
+            text-align: right;
+            color: white;
+        }
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+        }
+        .dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            z-index: 1001;
+        }
+        .dialog.show {
+            opacity: 1;
+            display: block;
+            /*animation: fadeIn 0.3s ease-in-out;*/
+        }
+        .dialog.hide {
+            opacity: 0;
+            display: none;
+            /*animation: fadeOut 0.3s ease-in-out;*/
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+        .dialog-button {
+            margin-top: 10px;
+            background: linear-gradient(135deg, #4F46E5, #9333EA);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            width: 85%;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="title">Mod Settings</div>
     <p id="loading">Loading...</p>
 
+    <div class="mod-main hidden">
+        <div class="mod-default-mode">
+            <div class="title-sub1">Default Control Mode</div>
+            <select id="default-mode">
+                <option value="key">Key Mode (WASD)</option>
+                <option value="mouse">Mouse Tracker Mode</option>
+                <option value="throw">Throw Mode</option>
+            </select>
+            <div class="title-sub2">Mode Switching</div>
+            <div class="container-keymode-switch-combo">
+                <div class="keymode-labels">
+                    <label class="key-label" id="mode1">Key Mode</label><br/>
+                    <label class="key-label" id="mode2">Mouse Tracker Mode</label><br/>
+                    <label class="key-label" id="mode3">Throw Mode</label>
+                </div>
+                <div class="keymode-buttons">
+                    <button class="key-button" id="mode1">(Not set)</button><br/>
+                    <button class="key-button" id="mode2">(Not set)</button><br/>
+                    <button class="key-button" id="mode3">(Not set)</button>
+                </div>
+            </div>
+            <div class="title-sub3">Additional Settings</div>
+            <div class="subtitle">Control Preferences</div>
+        </div>
+    </div>
+    <div class="dialog-overlay" id="dialog-overlay"></div>
+    <div class="dialog" id="dialog">
+        <p id="dialog-text">Please choose a default key mode.</p>
+        <button class="dialog-button" id="dialog-ok">OK</button>
+    </div>
     <script>
-        function wait(delay) {
-            setTimeout(function() {console.log("Delay")}, delay);
+
+        // userDefaultMode
+        // userMode1SwitchKeyCombo, userMode2SwitchKeyCombo, userMode3SwitchKeyCombo
+
+        function delay(ms, callback) {
+            setTimeout(callback, ms);
         }
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+
         const localData = {
             save: function(key, value) {
                 localStorage.setItem(key, value);
@@ -56,28 +248,121 @@
             }
         };
 
-        async function load() {
-            // First load to check if user finished setup
-            await delay(2000)
+        function load() {
             $("#loading").text("One Sec...");
-            await delay(1000)
-
-            if (!localData.exists("userPref")) {
-                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (5s)");
-                await delay(1000)
-                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (4s)");
-                await delay(1000)
-                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (3s)");
-                await delay(1000)
-                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (2s)");
-                await delay(1000)
-                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (1s)");
-                await delay(1000)
-                $("#loading").text("Redirecting...");
-                location.href = "./setup.html"
-            } else {}
+            delay(1000, function() {
+                if (!localData.exists("userPref")) {
+                    let countdown = 5;
+                    const intervalId = setInterval(function() {
+                        if (countdown > 0) {
+                            $("#loading").text(`First time running. Redirecting to setup... (${countdown}s)`);
+                            countdown--;
+                        } else {
+                            clearInterval(intervalId);
+                            $("#loading").text("Redirecting...");
+                            location.href = "./setup.html";
+                        }
+                    }, 1000);
+                } else {
+                    $("#loading").text("Hello.");
+                    $("#loading").addClass("hidden");
+                    $(".mod-main").removeClass("hidden");
+                    $("#default-mode").val(localData.load("userDefaultMode"));
+                    for (let index = 0; index < 4; index++) {
+                        $(`.keymode-buttons #mode${index}`).text(localData.load(`userMode${index}SwitchKeyCombo`));
+                    }
+                }
+            });
         }
-        load();
+
+        delay(800, load);
+
+
+        // That good old painful key combo code
+        let activeKeyButton = null;
+        let keys = [];
+        const keySymbols = {
+            "Control": "⌤",
+            "Shift": "⇧",
+            "Alt": "⌥",
+            "Meta": "⌘",
+            "Tab": "⭾"
+        };
+
+        const keyCombos = new Set();
+
+        document.querySelectorAll(".key-button").forEach(button => {
+            button.addEventListener("click", function() {
+                activeKeyButton = this;
+                this.textContent = "(Waiting for keys)";
+                keys = [];
+                $("#dialog-text").text("Set a key combo for switching to " + $(`.keymode-labels #${this.id}`).text());
+                $("#dialog-ok").addClass("hidden");
+                $("#dialog-overlay").removeClass("hide").addClass("show").fadeIn();
+                $("#dialog").removeClass("hide").addClass("show").fadeIn();
+            });
+        });
+
+        document.addEventListener("keydown", function(event) {
+            if (activeKeyButton) {
+                event.preventDefault();
+                const key = event.key.length === 1 ? event.key.toUpperCase() : event.key;
+                if (!keys.includes(key)) {
+                    keys.push(key);
+                    updateKeyButton();
+                }
+            }
+        });
+
+        document.addEventListener("keyup", function(event) {
+            if (activeKeyButton) {
+                // When all keys are released, check for duplicate key combos
+                if (keys.length !== 0) {
+                    const keyCombo = formatKeys(keys);
+                    if (keyCombos.has(keyCombo)) {
+                        $("#dialog-text").text("You used the same key combo again.");
+                        $("#dialog-ok").removeClass("hidden");
+                        $("#dialog-overlay").removeClass("hide").addClass("show").fadeIn();
+                        $("#dialog").removeClass("hide").addClass("show").fadeIn();
+                        activeKeyButton.textContent = "(Not set)";
+                    } else {
+                        keyCombos.add(keyCombo);
+                        activeKeyButton.textContent = keyCombo;
+                        $("#dialog").removeClass("show").addClass("hide").fadeOut();
+                        $("#dialog-overlay").removeClass("show").addClass("hide").fadeOut();
+                        $("#dialog-ok").addClass("hidden");
+                        localStorage.setItem(`userMode${(activeKeyButton.id).replace("mode", "")}SwitchKeyCombo`, activeKeyButton.textContent);
+                        console.log("Saved as: " + activeKeyButton.textContent);
+                    }
+                    activeKeyButton = null;
+                }
+            }
+        });
+
+        function updateKeyButton() {
+            if (keys.length === 0) {
+                activeKeyButton.textContent = "(Not set)";
+                return;
+            }
+
+            let displayKeys = keys.map(k => keySymbols[k] || k);
+            for (let i = 1; i < displayKeys.length; i++) {
+                if (displayKeys[i].length === 1 && displayKeys[i - 1].length === 1) {
+                    displayKeys[i - 1] += " + ";
+                }
+            }
+            activeKeyButton.textContent = displayKeys.join("");
+        }
+
+        function formatKeys(keys) {
+            let displayKeys = keys.map(k => keySymbols[k] || k);
+            for (let i = 1; i < displayKeys.length; i++) {
+                if (displayKeys[i].length === 1 && displayKeys[i - 1].length === 1) {
+                    displayKeys[i - 1] += " + ";
+                }
+            }
+            return displayKeys.join("");
+        }
     </script>
 </body>
 </html>
