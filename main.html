@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <title>Meow Playground KeyMod</title>
+    <style>
+        html {
+            display: flex;
+            justify-content: center;
+        }
+        body {
+            font-family: "Courier New", monospace;
+            background: #121826;
+            color: #ffffff;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            width: 100%;
+            position: relative;
+        }
+        .title {
+            font-size: 1.2rem;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Mod Settings</div>
+    <p id="loading">Loading...</p>
+
+    <script>
+        function wait(delay) {
+            setTimeout(function() {console.log("Delay")}, delay);
+        }
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const localData = {
+            save: function(key, value) {
+                localStorage.setItem(key, value);
+            },
+            load: function(key) {
+                return localStorage.getItem(key);
+            },
+            exists: function(key) {
+                return localStorage.getItem(key) !== null;
+            }
+        };
+
+        async function load() {
+            // First load to check if user finished setup
+            await delay(2000)
+            $("#loading").text("One Sec...");
+            await delay(1000)
+
+            if (!localData.exists("userPref")) {
+                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (5s)");
+                await delay(1000)
+                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (4s)");
+                await delay(1000)
+                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (3s)");
+                await delay(1000)
+                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (2s)");
+                await delay(1000)
+                $("#loading").text("You did not complete the first time setup step, redirecting you to the setup screen... (1s)");
+                await delay(1000)
+                $("#loading").text("Redirecting...");
+                location.href = "./setup.html"
+            } else {}
+        }
+        load();
+    </script>
+</body>
+</html>

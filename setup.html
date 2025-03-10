@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup - Meow Playground Extension</title>
+    <title>Setup - Meow Playground KeyMod</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <style>
@@ -107,12 +107,12 @@
         .dialog.show {
             opacity: 1;
             display: block;
-            animation: fadeIn 0.3s ease-in-out;
+            /*animation: fadeIn 0.3s ease-in-out;*/
         }
         .dialog.hide {
             opacity: 0;
             display: none;
-            animation: fadeOut 0.3s ease-in-out;
+            /*animation: fadeOut 0.3s ease-in-out;*/
         }
         
         @keyframes fadeIn {
@@ -164,7 +164,7 @@
 </head>
 <body>
     <div class="title">Mod Setup</div>
-    <p id="setup-text">Welcome, first let's start off with setting up the mod extension so it will match your control feelings.</p>
+    <p id="setup-text">Welcome, first let's start off with setting up the mod extension so it will match your needs.</p>
     
     <div class="container-default-keymode-set hidden">
         <select id="default-mode">
@@ -178,9 +178,9 @@
     
     <div class="container-keymode-switch-combo hidden">
         <div class="keymode-labels hidden">
-            <label>Key Mode</label><br/>
-            <label>Mouse Tracker Mode</label><br/>
-            <label>Throw Mode</label>
+            <label id="mode1">Key Mode</label><br/>
+            <label id="mode2">Mouse Tracker Mode</label><br/>
+            <label id="mode3">Throw Mode</label>
         </div>
         <div class="keymode-buttons hidden">
             <button class="key-button" id="mode1">(Not set)</button><br/>
@@ -208,7 +208,7 @@
             if (step === 1) {
                 $("#setup-text").text("Select your preferred key settings.");
                 $(".container-default-keymode-set").removeClass("hidden");
-                $("#progress-bar").css("width", "50%");
+                $("#progress-bar").css("width", "35%");
                 $("#progress-text").text("Step 2/3");
                 $(this).text("Next");
             } else if (step === 2) {
@@ -217,14 +217,15 @@
                     step--;
                     return;
                 }
-                $("#setup-text").text("Press the keys for switching between modes.");
+                localStorage.setItem("userDefaultMode", $("#default-mode").val());
+                $("#setup-text").text("Set the keys for switching between modes.");
                 $(".container-keymode-switch-combo").removeClass("hidden");
                 $(".keymode-buttons").removeClass("hidden");
                 $(".keymode-labels").removeClass("hidden");
                 $(".container-default-keymode-set").addClass("hidden");
-                $("#progress-bar").css("width", "100%");
+                $("#progress-bar").css("width", "65%");
                 $("#progress-text").text("Step 3/3");
-                $(this).text("Confirm and Finish Setup");
+                $(this).text("Confirm");
             }
         });
         $("#dialog-ok").on("click", function() {
@@ -232,26 +233,82 @@
                 $("#dialog").removeClass("show").addClass("hide");
             });
         });
-        let keyCombo = "";
-        document.addEventListener("keydown", function(event) {
-            event.preventDefault();
-            let key = event.key;
-            if (key.length === 1 && key.match(/[a-zA-Z]/)) {
-                key = key.toUpperCase();
+        let activeKeyButton = null;
+let keys = [];
+const keySymbols = {
+    "Control": "⎈",
+    "Shift": "⇧",
+    "Alt": "⌥",
+    "Meta": "⌘"
+};
+
+const keyCombos = new Set();
+
+document.querySelectorAll(".key-button").forEach(button => {
+    button.addEventListener("click", function() {
+        activeKeyButton = this;
+        this.textContent = "(Waiting for keys)";
+        keys = [];
+        $("#dialog-text").text("Press the keys for switching to " + $(`.keymode-labels #${this.id}`).text());
+        $("#dialog").removeClass("hide").addClass("show").fadeIn();
+    });
+});
+
+document.addEventListener("keydown", function(event) {
+    if (activeKeyButton) {
+        event.preventDefault();
+        const key = event.key.length === 1 ? event.key.toUpperCase() : event.key;
+        if (!keys.includes(key)) {
+            keys.push(key);
+            updateKeyButton();
+        }
+    }
+});
+
+document.addEventListener("keyup", function(event) {
+    if (activeKeyButton) {
+        // When all keys are released, check for duplicate key combos
+        if (keys.length !== 0) {
+            const keyCombo = formatKeys(keys);
+            if (keyCombos.has(keyCombo)) {
+                $("#dialog-text").text("You used the same key combo again.");
+                $("#dialog").removeClass("hide").addClass("show").fadeIn();
+                activeKeyButton.textContent = "(Not set)";
+            } else {
+                keyCombos.add(keyCombo);
+                activeKeyButton.textContent = keyCombo;
+                $("#dialog").removeClass("show").addClass("hide").fadeOut();
+                console.log("Saved as: " + activeKeyButton.textContent);
             }
-            if (event.ctrlKey) key = "(Ctrl)" + key;
-            if (event.shiftKey) key = "(Shift)" + key;
-            if (event.altKey) key = "(Alt)" + key;
-            if (event.metaKey) key = "(Meta)" + key;
-            
-            if (!keyCombo.includes(key)) {
-                keyCombo += keyCombo ? " + " + key : key;
-            }
-            console.log("Key Combo:", keyCombo);
-        });
-        document.addEventListener("keyup", function() {
-            keyCombo = "";
-        });
+            activeKeyButton = null;
+        }
+    }
+});
+
+function updateKeyButton() {
+    if (keys.length === 0) {
+        activeKeyButton.textContent = "(Not set)";
+        return;
+    }
+
+    let displayKeys = keys.map(k => keySymbols[k] || k);
+    for (let i = 1; i < displayKeys.length; i++) {
+        if (displayKeys[i].length === 1 && displayKeys[i - 1].length === 1) {
+            displayKeys[i - 1] += " + ";
+        }
+    }
+    activeKeyButton.textContent = displayKeys.join("");
+}
+
+function formatKeys(keys) {
+    let displayKeys = keys.map(k => keySymbols[k] || k);
+    for (let i = 1; i < displayKeys.length; i++) {
+        if (displayKeys[i].length === 1 && displayKeys[i - 1].length === 1) {
+            displayKeys[i - 1] += " + ";
+        }
+    }
+    return displayKeys.join("");
+}
     </script>
 </body>
 </html>
