@@ -3,35 +3,22 @@
   "name": "Meow Playground KeyMod",
   "version": "0.1.0",
   "description": "A Chrome extension for customizing key modes in Meow Playground.",
-  "permissions": ["storage"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["storage", "notifications"],
+  "background": {
+    "service_worker": "./src/scripts/background.js",
+    "type": "module"
+  },
   "action": {
-    "default_popup": "src/main.html",
+    "default_popup": "./src/main.html",
     "default_icon": {
-      "16": "src/assets/icons/icon16.png",
-      "48": "src/assets/icons/icon48.png",
-      "128": "src/assets/icons/icon128.png"
+      "16": "./src/assets/icons/icon16.png",
+      "48": "./src/assets/icons/icon48.png",
+      "128": "./src/assets/icons/icon128.png"
     }
   },
   "icons": {
-    "16": "src/assets/icons/icon16.png",
-    "48": "src/assets/icons/icon48.png",
-    "128": "src/assets/icons/icon128.png"
-  },
-  "background": {
-    "service_worker": "src/scripts/background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["src/scripts/content.js"],
-      "css": ["src/styles/shared.css"]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["src/assets/icons/*", "src/styles/*"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+    "16": "./src/assets/icons/icon16.png",
+    "48": "./src/assets/icons/icon48.png",
+    "128": "./src/assets/icons/icon128.png"
+  }
 }

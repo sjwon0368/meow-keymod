@@ -1,12 +1,6 @@
 @import './common.css';
 
 /* Specific styles for main.css */
-.title-sub1 {
-    font-size: 1.05rem;
-    position: absolute;
-    top: 80px;
-    left: 60px;
-}
 .notification-container {
     position: fixed;
     bottom: 20px;
@@ -39,26 +33,32 @@ body {
 .title {
     font-size: 1.2rem;
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 2vh; /* Changed from px to vh */
+    left: 2vw; /* Changed from px to vw */
+}
+.title-sub1 {
+    font-size: 1.05rem;
+    position: absolute;
+    top: 8vh; /* Changed from px to vh for responsiveness */
+    left: 6vw; /* Changed from px to vw for responsiveness */
 }
 .title-sub2 {
     font-size: 1.05rem;
     position: absolute;
-    top: 180px;
-    left: 60px;
+    top: 18vh; /* Changed from px to vh */
+    left: 6vw; /* Changed from px to vw */
 }
 .title-sub3 {
     font-size: 1.05rem;
     position: absolute;
-    top: 430px;
-    left: 60px;
+    top: 43vh; /* Changed from px to vh */
+    left: 6vw; /* Changed from px to vw */
 }
-.subtitle {
+.subtitle-1 {
     font-size: 0.95rem;
     position: absolute;
-    top: 460px;
-    left: 80px;
+    top: 46vh; /* Changed from px to vh */
+    left: 8vw; /* Changed from px to vw */
 }
 .hidden {
     display: none;
@@ -70,8 +70,8 @@ select {
     border: none;
     padding: 8px;
     border-radius: 5px;
-    top: 115px;
-    left: 70px;
+    top: 11.5vh; /* Changed from px to vh */
+    left: 7vw; /* Changed from px to vw */
     position: absolute;
     font-size: 0.95rem;
 }
@@ -103,15 +103,15 @@ select {
     margin: 5px;
 }
 .container-keymode-switch-combo {
-    width: 400px;
-    height: 170px;
+    width: 40vw; /* Changed from px to vw */
+    height: 17vh; /* Changed from px to vh */
     display: flex;
     justify-content: space-between;
     align-items: center;
     text-align: left;
     position: absolute;
-    top: 220px;
-    left: 70px;
+    top: 22vh; /* Changed from px to vh */
+    left: 7vw; /* Changed from px to vw */
     border: 2px #434343 solid;
     border-radius: 10px;
 }

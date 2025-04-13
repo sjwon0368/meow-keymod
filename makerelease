@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Check if a version argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: ./makerelease <version>"
+    echo "Expected a String type value for <version> but got none."
+    exit 1
+fi
+
+VERSION=$1
+RELEASE_DIR="./releases/$VERSION"
+
+# Create the release directory
+echo "Creating release directory..."
+if [ -d "$RELEASE_DIR" ]; then
+    # This is the release_dir function
+    :release_dir
+    echo "Release directory already exists. Overwrite or release as a different version? (1, 2)"
+    echo "1. Overwrite"
+    echo "2. Release as a different version"
+    read -p "Choose an option (1 or 2): " choice
+    if [ "$choice" -eq 1 ]; then
+        rm -rf "$RELEASE_DIR"
+    elif [ "$choice" -eq 2 ]; then
+        echo "Please provide a different version name:"
+        read -p "New version: " new_version
+        RELEASE_DIR="./releases/$new_version"
+    else
+        echo "Invalid choice."
+        goto release_dir
+    fi
+fi
+mkdir -p "$RELEASE_DIR"
+
+# Copy the specified files and folders
+echo "Copying files to release directory...(src/* and manifest.json)"
+cp -r ./src "$RELEASE_DIR"
+cp ./manifest.json "$RELEASE_DIR"
+
+echo "Release $VERSION created at $RELEASE_DIR"

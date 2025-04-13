@@ -1,4 +1,4 @@
-import $ from "https://code.jquery.com/jquery-3.6.0.min.js";
+import { showNotification } from "./notifications.js";
 
 window.addEventListener('error', function(event) {
     showNotification(`Error: ${event.message}`, 'error');
@@ -14,119 +14,40 @@ function delay(ms, callback) {
 
 const localData = {
     save: function(key, value) {
-        localStorage.setItem(key, value);
+        chrome.storage.local.set({ [key]: value }, function() {
+            console.log(`Saved ${key} to storage.`);
+        });
     },
-    load: function(key) {
-        return localStorage.getItem(key);
+    load: function(key, callback) {
+        chrome.storage.local.get([key], function(result) {
+            callback(result[key]);
+        });
     },
-    exists: function(key) {
-        return localStorage.getItem(key) !== null;
+    exists: function(key, callback) {
+        chrome.storage.local.get([key], function(result) {
+            callback(result[key] !== undefined);
+        });
     },
-    reset: function(comfirm) {
+    reset: function(confirm) {
         if (confirm) {
-            return localStorage.clear();
+            chrome.storage.local.clear(function() {
+                console.log("Storage cleared.");
+            });
         }
     },
     delete: function(key) {
-        return localStorage.removeItem(key);
+        chrome.storage.local.remove([key], function() {
+            console.log(`Removed ${key} from storage.`);
+        });
     }
 };
-
-const notificationQueue = [];
-const activeNotifications = [];
-const maxNotifications = 3;
-
-function showNotification(message, type, duration = 3500) {
-    notificationQueue.push({ message, type, duration });
-    if (activeNotifications.length < maxNotifications) {
-        displayNextNotification();
-    } else {
-        const oldestNotification = activeNotifications.shift();
-        if (oldestNotification.type === 'success' || oldestNotification.type === 'loading') {
-            removeNotification(oldestNotification.element);
-            displayNextNotification();
-        }
-    }
-}
-
-function displayNextNotification() {
-    if (notificationQueue.length === 0) {
-        return;
-    }
-
-    const { message, type, duration } = notificationQueue.shift();
-    const notificationContainer = document.querySelector('.notification-container') || createNotificationContainer();
-    const notificationBar = document.createElement('div');
-    notificationBar.className = 'notification-bar';
-    const notificationIcon = document.createElement('svg');
-    notificationIcon.className = 'notification-icon';
-    notificationIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    notificationIcon.setAttribute('viewBox', '0 0 24 24');
-    notificationIcon.setAttribute('width', '24');
-    notificationIcon.setAttribute('height', '24');
-    const notificationText = document.createElement('span');
-    notificationText.id = 'notification-text';
-    notificationText.textContent = message;
-
-    switch (type) {
-        case 'success':
-            notificationBar.style.backgroundColor = '#4CAF50';
-            notificationIcon.innerHTML = '<path fill="white" d="M9 16.2l-4.2-4.2-1.4 1.4 5.6 5.6 12-12-1.4-1.4z"/>';
-            break;
-        case 'error':
-            notificationBar.style.backgroundColor = '#F44336';
-            notificationIcon.innerHTML = '<path fill="white" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13l-1.41 1.41L12 13.41l-3.59 3.59L7 15l3.59-3.59L7 7.83 8.41 6.41 12 10l3.59-3.59L17 7.83l-3.59 3.59L17 15z"/>';
-            break;
-        case 'warning':
-            notificationBar.style.backgroundColor = '#FF9800';
-            notificationIcon.innerHTML = '<path fill="white" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>';
-            break;
-        case 'info':
-            notificationBar.style.backgroundColor = '#2196F3';
-            notificationIcon.innerHTML = '<path fill="white" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/>';
-            break;
-        case 'loading':
-            notificationBar.style.backgroundColor = '#808080';
-            notificationIcon.innerHTML = '<path fill="white" class="loading-icon" d="M12 2 A10 10 0 0 1 22 12"/>';
-            break;
-    }
-
-    notificationBar.appendChild(notificationIcon);
-    notificationBar.appendChild(notificationText);
-    notificationContainer.appendChild(notificationBar);
-
-    notificationBar.style.boxShadow = '0px 5px 15px rgba(0,0,0,0.3)';
-    notificationBar.classList.add('show');
-    activeNotifications.push({ element: notificationBar, type });
-
-    setTimeout(() => {
-        notificationBar.classList.remove('show');
-        notificationBar.classList.add('hide');
-        setTimeout(() => {
-            removeNotification(notificationBar);
-            displayNextNotification();
-        }, 500); // Wait for the fade-out animation to complete
-    }, duration);
-}
-
-function createNotificationContainer() {
-    const container = document.createElement('div');
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    return container;
-}
-
-function removeNotification(notificationBar) {
-    notificationBar.remove();
-    activeNotifications.shift();
-}
 
 function saveChanges() {
     showNotification('Saving...', 'loading', 1000);
     localData.save("userDefaultMode", $("#default-mode").val());
     console.log("Saved default mode to: " + $("#default-mode").val());
     for (let index = 1; index < 4; index++) {
-        localData.save($(`.keymode-buttons #mode${index}`).text());
+        localData.save(`userMode${index}SwitchKeyCombo`, $(`.keymode-buttons #mode${index}`).text());
         console.log(`Saved mode ${index} to: ` + $(`.keymode-buttons #mode${index}`).text());
     }
     setTimeout(() => {
@@ -137,29 +58,35 @@ function saveChanges() {
 function load() {
     $("#loading").text("One Sec...");
     delay(1000, function() {
-        if (!localData.exists("userPref")) {
-            let countdown = 5;
-            const intervalId = setInterval(function() {
-                if (countdown > 0) {
-                    $("#loading").text(`First time running. Redirecting to setup... (${countdown}s)`);
-                    countdown--;
-                } else {
-                    clearInterval(intervalId);
-                    $("#loading").text("Redirecting...");
-                    location.href = "./setup.html";
+        localData.exists("userPref", function(exists) {
+            if (!exists) {
+                let countdown = 5;
+                const intervalId = setInterval(function() {
+                    if (countdown > 0) {
+                        $("#loading").text(`First time running. Redirecting to setup... (${countdown}s)`);
+                        countdown--;
+                    } else {
+                        clearInterval(intervalId);
+                        $("#loading").text("Redirecting...");
+                        location.href = "./setup.html";
+                    }
+                }, 1000);
+            } else {
+                $("#loading").text("Hello.");
+                $("#loading").addClass("hidden");
+                $(".mod-main").removeClass("hidden");
+                localData.load("userDefaultMode", function(value) {
+                    $("#default-mode").val(value);
+                });
+                for (let index = 1; index < 4; index++) {
+                    localData.load(`userMode${index}SwitchKeyCombo`, function(value) {
+                        $(`.keymode-buttons #mode${index}`).text(value);
+                    });
                 }
-            }, 1000);
-        } else {
-            $("#loading").text("Hello.");
-            $("#loading").addClass("hidden");
-            $(".mod-main").removeClass("hidden");
-            $("#default-mode").val(localData.load("userDefaultMode"));
-            for (let index = 1; index < 4; index++) {
-                $(`.keymode-buttons #mode${index}`).text(localData.load(`userMode${index}SwitchKeyCombo`));
+                showNotification('Changes made in settings will be automatically saved.', 'info');
+                //dummyFunctionForError(); // this is not a real function, just for testing error handling
             }
-            showNotification('Changes made in settings will be automatically saved.', 'info');
-            dummyFunctionForError(); // this is not a real function, just for testing error handling
-        }
+        });
     });
 }
 
@@ -219,8 +146,9 @@ document.addEventListener("keyup", function(event) {
                 $("#dialog").removeClass("show").addClass("hide").fadeOut();
                 $("#dialog-overlay").removeClass("show").addClass("hide").fadeOut();
                 $("#dialog-ok").addClass("hidden");
-                localStorage.setItem(`userMode${(activeKeyButton.id).replace("mode", "")}SwitchKeyCombo`, activeKeyButton.textContent);
-                console.log(`Saved mode ${(activeKeyButton.id).replace("mode", "")} key combo to: ` + activeKeyButton.textContent);
+                chrome.storage.local.set({ [`userMode${(activeKeyButton.id).replace("mode", "")}SwitchKeyCombo`]: activeKeyButton.textContent }, function() {
+                    console.log(`Saved mode ${(activeKeyButton.id).replace("mode", "")} key combo to: ` + activeKeyButton.textContent);
+                });
             }
             activeKeyButton = null;
         }
