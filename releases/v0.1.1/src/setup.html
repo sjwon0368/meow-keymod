@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup - Meow Playground KeyMod</title>
+    <link rel="stylesheet" href="./styles/common.css">
+    <link rel="stylesheet" href="./styles/setup.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="./scripts/notifications.js"></script>
+    <script src="./scripts/setup.js"></script>
+</head>
+<body>
+    <div class="title">Mod Setup</div>
+    <p id="setup-text">Welcome, first let's start off with setting up the mod extension so it will match your needs.</p>
+    
+    <div class="container-default-keymode-set hidden">
+        <select id="default-mode">
+            <option value="none">(Not set)</option>
+            <option value="key">Key Mode (WASD)</option>
+            <option value="mouse">Mouse Tracker Mode</option>
+            <option value="throw">Throw Mode</option>
+        </select>
+        <br/>
+    </div>
+    
+    <div class="container-keymode-switch-combo hidden">
+        <div class="keymode-labels hidden">
+            <label id="mode1">Key Mode</label><br/>
+            <label id="mode2">Mouse Tracker Mode</label><br/>
+            <label id="mode3">Throw Mode</label>
+        </div>
+        <div class="keymode-buttons hidden">
+            <button class="key-button" id="mode1">(Not set)</button><br/>
+            <button class="key-button" id="mode2">(Not set)</button><br/>
+            <button class="key-button" id="mode3">(Not set)</button>
+        </div>
+    </div>
+    
+    <a id="next-step" class="button">Start</a>
+    
+    <div class="progress-text" id="progress-text">Step 1/3</div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="dialog-overlay" id="dialog-overlay"></div>
+    <div class="dialog" id="dialog">
+        <p id="dialog-text">Please choose a default key mode.</p>
+        <button class="dialog-button" id="dialog-ok">OK</button>
+    </div>
+</body>
+</html>

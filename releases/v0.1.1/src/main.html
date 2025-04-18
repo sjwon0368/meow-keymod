@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/common.css">
+    <link rel="stylesheet" href="./styles/main.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="./scripts/notifications.js"></script>
+    <script type="module" src="./scripts/main.js"></script>
+    <title>Meow Playground KeyMod</title>
+</head>
+<body>
+    <div class="title">Mod Settings</div>
+    <p id="loading">Loading...</p>
+
+    <div class="mod-main hidden">
+        <div class="mod-default-mode">
+            <div class="title-sub1">Default Control Mode</div>
+            <select id="default-mode" onchange="javascript:saveChanges()">
+                <option value="key">Key Mode (WASD)</option>
+                <option value="mouse">Mouse Tracker Mode</option>
+                <option value="throw">Throw Mode</option>
+            </select>
+            <div class="title-sub2">Mode Switching</div>
+            <div class="container-keymode-switch-combo">
+                <div class="keymode-labels">
+                    <label class="key-label" id="mode1">Key Mode</label><br/>
+                    <label class="key-label" id="mode2">Mouse Tracker Mode</label><br/>
+                    <label class="key-label" id="mode3">Throw Mode</label>
+                </div>
+                <div class="keymode-buttons">
+                    <button class="key-button" id="mode1">(Not set)</button><br/>
+                    <button class="key-button" id="mode2">(Not set)</button><br/>
+                    <button class="key-button" id="mode3">(Not set)</button>
+                </div>
+            </div>
+            <div class="title-sub3">Additional Settings</div>
+            <div class="subtitle">Control Preferences</div>
+        </div>
+    </div>
+    <div class="dialog-overlay" id="dialog-overlay"></div>
+    <div class="dialog" id="dialog">
+        <p id="dialog-text">Please choose a default key mode.</p>
+        <button class="dialog-button" id="dialog-ok">OK</button>
+    </div>
+    <div class="notification-container"></div>
+</body>
+</html>

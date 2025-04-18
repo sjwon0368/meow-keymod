@@ -1,0 +1,254 @@
+@import './common.css';
+
+/* Specific styles for main.css */
+.notification-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+html {
+    display: flex;
+    justify-content: center;
+}
+body {
+    font-family: "Courier New", monospace;
+    background: #121826;
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    width: 100%;
+    position: relative;
+}
+.title {
+    font-size: 1.2rem;
+    position: absolute;
+    top: 2vh; /* Changed from px to vh */
+    left: 2vw; /* Changed from px to vw */
+}
+.title-sub1 {
+    font-size: 1.05rem;
+    position: absolute;
+    top: 8vh; /* Changed from px to vh for responsiveness */
+    left: 6vw; /* Changed from px to vw for responsiveness */
+}
+.title-sub2 {
+    font-size: 1.05rem;
+    position: absolute;
+    top: 18vh; /* Changed from px to vh */
+    left: 6vw; /* Changed from px to vw */
+}
+.title-sub3 {
+    font-size: 1.05rem;
+    position: absolute;
+    top: 43vh; /* Changed from px to vh */
+    left: 6vw; /* Changed from px to vw */
+}
+.subtitle-1 {
+    font-size: 0.95rem;
+    position: absolute;
+    top: 46vh; /* Changed from px to vh */
+    left: 8vw; /* Changed from px to vw */
+}
+.hidden {
+    display: none;
+}
+select {
+    appearance: none;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    top: 11.5vh; /* Changed from px to vh */
+    left: 7vw; /* Changed from px to vw */
+    position: absolute;
+    font-size: 0.95rem;
+}
+.button {
+    background: linear-gradient(135deg, #4F46E5, #9333EA);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+}
+.button:hover {
+    transform: scale(1.05);
+}
+.button:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+.key-button {
+    background: #444;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+}
+.container-keymode-switch-combo {
+    width: 40vw; /* Changed from px to vw */
+    height: 17vh; /* Changed from px to vh */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    position: absolute;
+    top: 22vh; /* Changed from px to vh */
+    left: 7vw; /* Changed from px to vw */
+    border: 2px #434343 solid;
+    border-radius: 10px;
+}
+.keymode-labels {
+    flex: 1;
+    margin-left: 10px;
+}
+.key-label {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.keymode-buttons {
+    flex: 1;
+    text-align: right;
+    color: white;
+}
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: none;
+}
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    z-index: 1001;
+}
+.dialog.show {
+    opacity: 1;
+    display: block;
+    /*animation: fadeIn 0.3s ease-in-out;*/
+}
+.dialog.hide {
+    opacity: 0;
+    display: none;
+    /*animation: fadeOut 0.3s ease-in-out;*/
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+.dialog-button {
+    margin-top: 10px;
+    background: linear-gradient(135deg, #4F46E5, #9333EA);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    width: 85%;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.notification-bar {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    animation: fadeInDown 0.5s ease-in-out, fadeOutDown 0.5s ease-in-out 3s;
+}
+.notification-bar.show {
+    display: flex;
+}
+.notification-bar.hide {
+    display: none;
+}
+.notification-icon {
+    margin-right: 10px;
+}
+.loading-icon {
+    animation: spin 0.5s linear infinite;
+    transform-origin: center;
+}
+.loading-icon path {
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+}
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
