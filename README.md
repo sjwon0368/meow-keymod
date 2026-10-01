@@ -1,3 +1,3 @@
 # meow-keymod
 A key mod extension for the Meow Playground game.
-<script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
+This repo is now archived since I cannot think of a reason to keep developing it(it was WIP anyway).
